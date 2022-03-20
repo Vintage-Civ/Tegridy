@@ -14,7 +14,7 @@ namespace Tegridy
         public Harmony harmonyInstance;
         private static bool harmonyPatched;
 
-        public override double ExecuteOrder() => double.NegativeInfinity;
+        public override double ExecuteOrder() => double.MinValue;
         public override void StartPre(ICoreAPI api)
         {
             if (harmonyPatched) return;
