@@ -21,7 +21,6 @@ namespace Tegridy
             using (FileStream stream = File.OpenRead(filePath))
             {
                 string str = GetString(tfs.ComputeHash(stream));
-                tfs.Clear();
                 return str;
             }
         }
@@ -51,9 +50,7 @@ namespace Tegridy
                 {
                     hash = tfs.TransformFinalBlock(contentBytes, 0, contentBytes.Length);
                 }
-            }
-
-            tfs.Clear();
+            };
             return GetString(hash);
         }
 
@@ -71,7 +68,6 @@ namespace Tegridy
         public static string Sha256Hash(string value)
         {
             var hash = tfs.ComputeHash(Encoding.UTF8.GetBytes(value));
-            tfs.Clear();
             return GetString(hash);
         }
     }
