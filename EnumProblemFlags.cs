@@ -19,6 +19,6 @@
         /// <summary>Offset: 4</summary>
         EmptyReports = 16,
 
-        All = UnrecognizedModId | UnrecognizedVersion | UnrecognizedSourceType | UnrecognizedFingerprint | EmptyReports
+        All = UnrecognizedModId | UnrecognizedVersion | UnrecognizedSourceType | UnrecognizedFingerprint | EmptyReports,
     }
 }

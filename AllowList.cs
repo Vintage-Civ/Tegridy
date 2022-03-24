@@ -22,39 +22,33 @@ namespace Tegridy
 
         internal EnumProblemFlags GetReportProblem(TegridyReport report)
         {
-            EnumProblemFlags flags = EnumProblemFlags.None;
+            EnumProblemFlags flags = EnumProblemFlags.All;
 
             if (allowedReportsById.TryGetValue(report.Id, out var tegridyReports))
             {
-                if (tegridyReports.Count == 0)
-                {
-                    flags |= EnumProblemFlags.EmptyReports;
-                }
-
                 foreach (var allowed in tegridyReports)
                 {
-                    if (allowed.Fingerprint != report.Fingerprint)
-                    {
-                        flags |= EnumProblemFlags.UnrecognizedFingerprint;
-                    }
-                    else break;
+                    flags = EnumProblemFlags.All;
+                    flags &= ~EnumProblemFlags.UnrecognizedModId;
+                    flags &= ~EnumProblemFlags.EmptyReports;
 
-                    if (allowed.Version != report.Version)
+                    if (allowed.Fingerprint == report.Fingerprint)
                     {
-                        flags |= EnumProblemFlags.UnrecognizedVersion;
+                        flags &= ~EnumProblemFlags.UnrecognizedFingerprint;
                     }
 
-                    if (allowed.SourceType != report.SourceType)
+                    if (allowed.Version == report.Version)
                     {
-                        flags |= EnumProblemFlags.UnrecognizedSourceType;
+                        flags &= ~EnumProblemFlags.UnrecognizedVersion;
                     }
 
-                    if (flags > 0) break;
+                    if (allowed.SourceType == report.SourceType)
+                    {
+                        flags &= ~EnumProblemFlags.UnrecognizedSourceType;
+                    }
+
+                    if (flags == 0) break;
                 }
-            }
-            else
-            {
-                flags |= EnumProblemFlags.UnrecognizedModId;
             }
 
             return flags;
