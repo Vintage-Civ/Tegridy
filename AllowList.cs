@@ -54,10 +54,14 @@ namespace Tegridy
             return flags;
         }
 
-        internal const string bannedMod = @"Unrecognized or banned mod '{0}' — please disable this mod using the in-game Mod Manager.";
-        internal const string bannedVersion = @"Unrecognized or banned version '{0}' for mod '{1}' — please update to a known good version, such as: {2}";
-        internal const string bannedType = @"Unrecognized or banned source type '{0}' for mod '{1}' — please update this mod to use a known good source type, such as: {2}";
-        internal const string bannedFingerprint = @"Unrecognized or banned fingerprint for mod '{0}' — please update this mod with a freshly downloaded copy.";
+        internal readonly string[] modProblems = new string[]
+        {
+            @"| Unrecognized Mod ID |",
+            @"| Unrecognized Version |",
+            @"| Unrecognized Type |", 
+            @"| Unrecognized Fingerprint |",
+            @"| Empty Mod Reports |"
+        };
 
         internal bool HasErrors(TegridyReport report, out string errors)
         {
@@ -78,26 +82,34 @@ namespace Tegridy
             StringBuilder builder = new StringBuilder();
             if (flags != EnumProblemFlags.None)
             {
+                builder.AppendLine(string.Format("{0}:", report.Name));
+
+                builder.Append('|');
                 if ((((int)flags >> 0) & 1) > 0)
                 {
-                    builder.AppendLine(Lang.Get(bannedMod, report.Name));
+                    builder.Append(Lang.Get(modProblems[0]));
                 }
 
                 if ((((int)flags >> 1) & 1) > 0)
                 {
-                    builder.AppendLine(Lang.Get(bannedVersion, report.Version, report.Name, string.Join(", ", GetAllowedVersionsForMod(report.Id))));
+                    builder.Append(Lang.Get(modProblems[1]));
                 }
 
                 if ((((int)flags >> 2) & 1) > 0)
                 {
-                    string type = Enum.GetName(typeof(EnumModSourceType), report.SourceType);
-                    builder.AppendLine(Lang.Get(bannedType, type, report.Name, string.Join(", ", GetAllowedSourceTypesForMod(report.Id))));
+                    builder.Append(Lang.Get(modProblems[2]));
                 }
 
                 if ((((int)flags >> 3) & 1) > 0)
                 {
-                    builder.AppendLine(Lang.Get(bannedFingerprint, report.Name));
+                    builder.Append(Lang.Get(modProblems[3]));
                 }
+
+                if ((((int)flags >> 4) & 1) > 0)
+                {
+                    builder.Append(Lang.Get(modProblems[4]));
+                }
+                builder.Append('|');
             }
             else
             {

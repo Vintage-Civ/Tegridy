@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
+using Vintagestory.API.Datastructures;
 using Vintagestory.API.Server;
 using Vintagestory.Server;
 
 [assembly: ModInfo("Tegridy", 
     Side = "Universal",
     Description = "Ensures that clients only use mods approved by a server, including client-only mods.",
-    Version = "0.3.0",
+    Version = "0.3.1",
     Authors = new[] { "goxmeor", "Novocain" }
     )]
 
@@ -135,9 +136,10 @@ namespace Tegridy
 
                     disconnectMsg.AppendLine();
 
-                    foreach (var issue in modIssuesForClient)
+                    foreach (string issue in modIssuesForClient)
                     {
                         disconnectMsg.AppendLine(issue);
+                        disconnectMsg.AppendLine();
                     }
 
                     disconnectMsg.AppendLine(config.ExtraDisconnectMessage);
