@@ -150,7 +150,7 @@ namespace Tegridy
                     }
 
                     disconnectMsg.AppendLine(config.ExtraDisconnectMessage);
-                    if (config.HelpLink != "")
+                    if (config.HelpLink.Length > 0)
                     {
                         disconnectMsg.Append(string.Format("Contact Server At: {0}", config.HelpLink));
                     }
