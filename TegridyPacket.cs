@@ -7,5 +7,10 @@ namespace Tegridy
     internal class TegridyPacket
     {
         public List<TegridyReport> Reports = new List<TegridyReport>();
+
+        internal void AddReport(TegridyReport report)
+        {
+            Reports.Add(report);
+        }
     }
 }

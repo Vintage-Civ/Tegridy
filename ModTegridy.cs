@@ -13,7 +13,7 @@ using Vintagestory.Server;
 [assembly: ModInfo("Tegridy", 
     Side = "Universal",
     Description = "Ensures that clients only use mods approved by a server, including client-only mods.",
-    Version = "0.3.1",
+    Version = "0.3.2",
     Authors = new[] { "goxmeor", "Novocain" }
     )]
 
@@ -24,8 +24,8 @@ namespace Tegridy
         public override double ExecuteOrder() => double.NegativeInfinity;
 
         internal INetworkChannel channel;
-        internal IClientNetworkChannel cChannel { get => channel as IClientNetworkChannel; }
-        internal IServerNetworkChannel sChannel { get => channel as IServerNetworkChannel; }
+        internal IClientNetworkChannel CChannel { get => channel as IClientNetworkChannel; }
+        internal IServerNetworkChannel SChannel { get => channel as IServerNetworkChannel; }
 
         internal AllowList allowList = new AllowList();
         internal TegridyServerConfig config;
@@ -61,6 +61,7 @@ namespace Tegridy
         const string kickUnrecognized = @"Tegridy: Kicked {0} ({1} for the following unrecognized mod(s):";
         const string toAdd = @"To add all of the above mod fingerprints to the Tegridy allow list, trusting that {0}'s versions are untampered with, type:";
         const string tegridyApprove = @"\tegridyapprove {0}";
+        const string kickNoMods = @"Your reports sent was empty, no bypass here!";
 
         public void StartPreServer(ICoreServerAPI api)
         {
@@ -98,8 +99,14 @@ namespace Tegridy
                 nonReportingTimeByUID.Remove(player.PlayerUID);
             };
 
-            sChannel.SetMessageHandler((IServerPlayer byPlayer, TegridyPacket packet) =>
+            SChannel.SetMessageHandler((IServerPlayer byPlayer, TegridyPacket packet) =>
             {
+                if (packet.Reports.Count == 0)
+                {
+                    DisconnectPlayerWithFriendlyMessage(byPlayer, kickNoMods);
+                    return;
+                }
+
                 if (nonReportingTimeByUID.TryGetValue(byPlayer.PlayerUID, out var startTime))
                 {
                     double totalMs = (DateTime.Now - startTime).TotalMilliseconds;
@@ -143,6 +150,10 @@ namespace Tegridy
                     }
 
                     disconnectMsg.AppendLine(config.ExtraDisconnectMessage);
+                    if (config.HelpLink != "")
+                    {
+                        disconnectMsg.Append(string.Format("Contact Server At: {0}", config.HelpLink));
+                    }
 
                     DisconnectPlayerWithFriendlyMessage(byPlayer, disconnectMsg.ToString());
                     api.Logger.Event(Lang.Get(kickUnrecognized, playerName, playerUID));
@@ -198,12 +209,12 @@ namespace Tegridy
             foreach (var mod in api.ModLoader.Mods)
             {
                 TegridyReport report = TegridyReport.Create(mod);
-                packet.Reports.Add(report);
+                packet.AddReport(report);
             }
 
             api.Event.IsPlayerReady += (ref EnumHandling handling) =>
             {
-                cChannel.SendPacket(packet);
+                CChannel.SendPacket(packet);
                 return true;
             };
         }

@@ -33,6 +33,9 @@ namespace Tegridy
         [JsonProperty]
         private Dictionary<string, string> configVersionByField = Versions;
 
+        [JsonProperty]
+        private string helpLink = "";
+
         public TegridyServerConfig(ICoreServerAPI sapi)
         {
             this.sapi = sapi;
@@ -48,6 +51,11 @@ namespace Tegridy
         { 
             get { Load(); return configVersionByField; } 
             set { configVersionByField = value; Save(); } 
+        }
+
+        public string HelpLink { 
+            get { Load(); return helpLink; } 
+            set { helpLink = value; Save(); } 
         }
 
         public string ExtraDisconnectMessage
@@ -76,9 +84,9 @@ namespace Tegridy
                 var conf = sapi.LoadModConfig<TegridyServerConfig>("tegridy/server.json") ?? newConfig;
 
                 clientReportGraceSeconds = conf.clientReportGraceSeconds ?? newConfig.ClientReportGraceSeconds;
-                extraDisconnectMessage = conf.extraDisconnectMessage ?? newConfig.extraDisconnectMessage;
                 allowedClientMods = conf.allowedClientMods ?? newConfig.allowedClientMods;
                 configVersionByField = conf.configVersionByField ?? newConfig.configVersionByField;
+                helpLink = conf.helpLink ?? newConfig.helpLink; 
                 var fieldNames = AccessTools.GetFieldNames(this);
                 fieldNames.Remove("sapi");
                 fieldNames.Remove("Versions");
